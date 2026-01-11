@@ -120,16 +120,6 @@ pytest tests/ -v
 pytest tests/ --cov=src --cov-report=term-missing
 ```
 
-**预期输出**：
-
-```
-tests/test_price_calculator.py::test_normal_calculation PASSED
-tests/test_price_calculator.py::test_no_discount PASSED
-tests/test_price_calculator.py::test_points_calculation PASSED
-
----------- coverage: 100% -----------
-```
-
 ### ✅ 阶段1检查点
 
 - [ ] `src/price_calculator.py` 已创建
@@ -162,7 +152,20 @@ pytest-cov==4.1.0
 pylint==2.17.4
 ```
 
-### 步骤2.3：创建GitHub仓库
+### 步骤2.3：本地验证质量门
+
+在推送代码前，先在本地执行质量门检查，确保所有检查都能通过：
+
+```bash
+# 步骤1：安装依赖
+pip install -r requirements.txt
+
+# 步骤2：Pylint代码质量检查（要求评分 >= 8.0）
+python -m pylint src/ --fail-under=8.0
+```
+
+
+### 步骤2.4：创建GitHub仓库
 
 **操作步骤**：
 
@@ -172,7 +175,7 @@ pylint==2.17.4
 4. 不勾选任何初始化选项
 5. 点击"Create repository"
 
-### 步骤2.4：推送代码到GitHub
+### 步骤2.5：推送代码到GitHub
 
 ```bash
 # 添加所有文件
@@ -186,7 +189,7 @@ git remote add origin https://github.com/YOUR_USERNAME/ai-cicd-demo.git
 git push -u origin main
 ```
 
-### 步骤2.5：查看Actions运行结果
+### 步骤2.6：查看Actions运行结果
 
 **操作步骤**：
 
@@ -203,18 +206,38 @@ git push -u origin main
 ✅ Lint with pylint           (3s)  Score: 9.8/10
 ✅ Run unit tests             (2s)  Coverage: 100%
 ✅ Quality Gate Check         (1s)
+✅ Upload coverage report     (2s)
 
-Total: 34s - SUCCESS 🎉
+Total: 36s - SUCCESS 🎉
 ```
+
+### 步骤2.7：下载并查看覆盖率报告
+
+**操作步骤**：
+
+1. 在Actions流水线详情页面，滚动到页面底部
+2. 找到 **Artifacts** 区域
+3. 点击下载 `coverage-report`
+4. 解压缩后，用浏览器打开 `index.html`
+
+**查看内容**：
+- 📊 整体覆盖率统计（100%）
+- 📁 每个文件的详细覆盖情况
+- 🎨 代码行级别的覆盖高亮
+
+💡 **提示**：HTML报告比终端输出更直观，可以看到哪些代码行被测试覆盖。
 
 ### ✅ 阶段2检查点
 
+- [ ] 本地Pylint检查通过（评分 ≥ 8.0）
+- [ ] 本地Pytest测试通过（覆盖率 ≥ 80%）
 - [ ] GitHub仓库已创建
 - [ ] 代码已推送到main分支
 - [ ] Actions流水线已执行
 - [ ] 所有检查显示✅通过
+- [ ] 已下载并查看HTML覆盖率报告
 
-💡 **关键观察**：传统质量门全部通过，但我们知道代码有负价格漏洞！
+💡 **关键观察**：本地验证和GitHub Actions都显示通过，覆盖率报告显示100%覆盖，但我们知道代码有负价格漏洞！这正是传统质量门的盲区。
 
 ---
 

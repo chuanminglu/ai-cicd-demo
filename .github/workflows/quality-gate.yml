@@ -34,7 +34,7 @@ jobs:
     - name: Pytest单元测试与覆盖率
       run: |
         echo "🧪 执行单元测试并检查覆盖率..."
-        pytest tests/ --cov=src --cov-report=term-missing --cov-fail-under=80 -v
+        pytest tests/ --cov=src --cov-report=term-missing --cov-report=html --cov-fail-under=80 -v
         echo "✅ 测试通过，覆盖率 >= 80%"
         
     - name: 输出质量门总结
@@ -54,9 +54,9 @@ jobs:
         fi
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         
-    - name: 上传覆盖率报告
+    - name: 上传HTML覆盖率报告
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
-        path: .coverage
+        path: htmlcov/
