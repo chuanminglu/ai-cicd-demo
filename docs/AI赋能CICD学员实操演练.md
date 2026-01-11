@@ -164,7 +164,6 @@ pip install -r requirements.txt
 python -m pylint src/ --fail-under=8.0
 ```
 
-
 ### 步骤2.4：创建GitHub仓库
 
 **操作步骤**：
@@ -221,73 +220,50 @@ Total: 36s - SUCCESS 🎉
 4. 解压缩后，用浏览器打开 `index.html`
 
 **查看内容**：
+
 - 📊 整体覆盖率统计（100%）
 - 📁 每个文件的详细覆盖情况
 - 🎨 代码行级别的覆盖高亮
 
 💡 **提示**：HTML报告比终端输出更直观，可以看到哪些代码行被测试覆盖。
 
-### ✅ 阶段2检查点
-
-- [ ] 本地Pylint检查通过（评分 ≥ 8.0）
-- [ ] 本地Pytest测试通过（覆盖率 ≥ 80%）
-- [ ] GitHub仓库已创建
-- [ ] 代码已推送到main分支
-- [ ] Actions流水线已执行
-- [ ] 所有检查显示✅通过
-- [ ] 已下载并查看HTML覆盖率报告
-
-💡 **关键观察**：本地验证和GitHub Actions都显示通过，覆盖率报告显示100%覆盖，但我们知道代码有负价格漏洞！这正是传统质量门的盲区。
 
 ---
 
 ## 🤖 阶段3：AI发现问题（15分钟）
 
-### 步骤3.1：创建Pull Request
+> **💡 简化说明**：本阶段重点是体验AI代码审查能力，无需本地操作，直接在GitHub网页上完成。
 
-```bash
-# 创建功能分支
-git checkout -b feature/price-calculator
-
-# 提交一个小改动（触发PR）
-echo "# Price Calculator" > README.md
-git add README.md
-git commit -m "docs: add README"
-
-# 推送分支
-git push origin feature/price-calculator
-```
-
-### 步骤3.2：在GitHub创建PR
+### 步骤3.1：在GitHub上查看已推送的代码
 
 **操作步骤**：
 
-1. 访问仓库页面，点击"Pull requests"
-2. 点击"New pull request"
-3. 选择 `feature/price-calculator` → `main`
-4. 标题：`feat: add price calculator module`
-5. 点击"Create pull request"
+1. 访问你的GitHub仓库页面
+2. 点击 `src/price_calculator.py` 文件
+3. 观察代码内容，特别是 `calculate_final_price` 方法
 
-### 步骤3.3：使用AI审查代码
+**关键观察**：
+- ✅ 代码简洁清晰
+- ✅ Pylint评分10.0/10
+- ✅ 测试覆盖率100%
+- ⚠️ 但存在负价格漏洞（我们即将用AI发现）
+
+### 步骤3.2：使用AI审查代码
 
 📋 **使用提示词**：[prompts/04-AI代码审查.md](../prompts/04-AI代码审查.md)
 
-**方式1：PR评论触发（推荐）**
+**操作步骤**：
 
-1. 在PR页面的评论框输入：
-   ```
-   @github-copilot 请全面审查 src/price_calculator.py 的健壮性和潜在风险
-   ```
-2. 等待AI反馈
+1. 在GitHub仓库页面，点击 `src/price_calculator.py` 文件
+2. 点击右上角"复制"按钮，复制代码
+3. 打开Claude/ChatGPT/Copilot Chat（任选一个）
+4. 打开提示词文件，复制提示词内容
+5. 将提示词和代码一起发送给AI
+6. 阅读AI的审查反馈
 
-**方式2：手动使用AI（如无Copilot订阅）**
+💡 **提示**：如果有GitHub Copilot订阅，可以在Issues或Discussions中@copilot直接审查。
 
-1. 复制 `src/price_calculator.py` 代码
-2. 打开Claude/ChatGPT
-3. 粘贴提示词和代码
-4. 阅读AI的审查反馈
-
-### 步骤3.4：观察AI发现的问题
+### 步骤3.3：观察AI发现的问题
 
 **预期AI反馈**（关键片段）：
 
@@ -316,19 +292,20 @@ final_price 将为负数，用户不仅不用付款，系统还会倒贴钱。
 
 | 检查项         | 传统质量门        | AI质量门                |
 | -------------- | ----------------- | ----------------------- |
+| 语法检查  4：对比两种质量门
+
+| 检查项         | 传统质量门        | AI质量门                |
+| -------------- | ----------------- | ----------------------- |
 | 语法检查       | ✅ 通过           | ✅ 通过                 |
-| 代码规范       | ✅ 通过(9.8分)    | ✅ 通过                 |
+| 代码规范       | ✅ 通过(10.0分)   | ✅ 通过                 |
 | 单元测试       | ✅ 通过(100%覆盖) | ❌ 发现测试缺失边界场景 |
 | 业务逻辑       | ⚠️ 无法检测     | ❌ 发现负价格漏洞       |
 | **结果** | ✅ 通过（误判）   | ❌ 拦截（正确）         |
 
 ### ✅ 阶段3检查点
 
-- [ ] PR已创建
-- [ ] AI已反馈审查结果
-- [ ] 已理解AI发现的负价格漏洞
-- [ ] 已理解传统质量门的盲区
-
+- [ ] 已在GitHub上查看代码
+- [ ] 已使用AI审查代码
 💡 **核心洞察**：传统工具检查代码"格式"，AI理解代码"逻辑"
 
 ---
@@ -421,88 +398,72 @@ tests/test_price_calculator.py::test_negative_price_input PASSED    # 新增
 ## 🚀 阶段5：集成AI流水线（10分钟）
 
 ### 步骤5.1：使用AI生成AI赋能的流水线配置
+总结与展望（5分钟）
 
-📋 **使用提示词**：[prompts/07-生成AI赋能流水线.md](../prompts/07-生成AI赋能流水线.md)
+> **💡 说明**：本阶段总结AI在CI/CD中的价值，实际集成AI流水线需要企业级API支持，超出本次演练范围。
 
-**操作步骤**：
+### 步骤5.1：回顾完整流程
 
-1. 复制提示词执行
-2. 将生成的配置保存为 `.github/workflows/ai-quality-gate.yml`
+**我们完成了什么**：
 
-**关键配置**（示例）：
+1. ✅ **阶段1**：生成了有漏洞的代码和100%覆盖率的测试
+2. ✅ **阶段2**：搭建了传统质量门（Pylint + Pytest + Coverage）
+3. ✅ **阶段3**：用AI发现了传统工具无法检测的业务逻辑漏洞
+4. ✅ **阶段4**：用AI辅助修复代码并生成边界测试
+
+**核心发现**：
+```
+传统质量门：✅ Pylint 10.0/10 + ✅ 测试覆盖率100% = ❌ 仍有致命漏洞
+AI质量门：  🤖 理解业务逻辑 + 🔍 发现负价格风险 = ✅ 正确拦截
+```
+
+### 步骤5.2：理解AI集成的现实场景
+
+**企业级AI集成方案**（参考）：
 
 ```yaml
+# .github/workflows/ai-quality-gate.yml（概念示例）
 name: AI-Enhanced Quality Gate
-
-on: [push, pull_request]
 
 jobs:
   ai-review:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-  
-    # AI代码审查（使用GitHub Copilot或其他AI服务）
-    - name: AI Code Review
-      run: |
-        # 调用AI审查API（此处简化）
-        echo "🤖 AI正在审查代码..."
-        # 实际应调用 GitHub Copilot API 或其他AI服务
-  
-    # 如果AI发现BLOCKER，终止流水线
-    - name: Check AI Results
-      run: |
-        if [ -f "ai-blocker-found" ]; then
-          echo "❌ AI发现阻断性问题"
-          exit 1
-        fi
-  
-  traditional-gate:
-    needs: ai-review  # AI通过后才执行传统检查
-    runs-on: ubuntu-latest
-    steps:
-      # 传统质量门步骤...
+      - uses: actions/checkout@v3
+      
+      # 调用企业AI服务（需要API Key和付费订阅）
+      - name: AI代码审查
+        uses: enterprise/ai-code-review@v1
+        with:
+          api_key: ${{ secrets.AI_API_KEY }}
+          severity_threshold: 'BLOCKER'
+          
+      # 如果发现阻断性问题，终止部署
+      - name: 检查AI审查结果
+        run: |
+          if [ -f ".ai-review/blocker-found" ]; then
+            echo "❌ AI发现阻断性问题，终止部署"
+            exit 1
+          fi
 ```
 
-### 步骤5.2：提交修复代码并验证
+**实施建议**：
 
-```bash
-# 提交修复
-git add .
-git commit -m "fix: prevent negative price and add boundary tests"
-git push origin feature/price-calculator
-```
-
-### 步骤5.3：观察新流水线执行
-
-访问PR页面，观察两个流水线的对比：
-
-**修复前**：
-
-```
-传统质量门：✅ 全部通过（误判）
-AI质量门：  ❌ 发现BLOCKER（正确拦截）
-```
-
-**修复后**：
-
-```
-AI质量门：    ✅ 无阻断性问题
-传统质量门：  ✅ 全部通过
-总体结果：    ✅ 可以安全部署
-```
+| 场景 | 方案 | 成本 |
+|------|------|------|
+| 个人项目 | 手动使用Claude/ChatGPT审查核心代码 | 免费/低成本 |
+| 小团队 | Pre-commit Hook + AI CLI工具 | 低成本 |
+| 中型团队 | GitHub Copilot + 代码评审规范 | 中成本 |
+| 大型企业 | 自建AI平台 + CI/CD深度集成 | 高成本 |
 
 ### ✅ 阶段5检查点
 
-- [ ] AI赋能流水线配置已添加
-- [ ] 修复代码已提交
-- [ ] 新流水线执行成功
-- [ ] PR可以合并
+- [ ] 已完成完整的演练流程
+- [ ] 已理解AI在质量门中的价值
+- [ ] 已了解企业级AI集成的方向
+- [ ] 已掌握如何在实际项目中应用AI辅助
 
-💡 **最终效果**：AI作为"第一道防线"，拦截业务逻辑问题
-
----
-
+💡 **关键启发**：AI不是替代传统工具，而是作为"第二双眼睛"补足人的经验不足
 ## 📊 阶段6：总结讨论（5分钟）
 
 ### 核心对比
@@ -518,7 +479,7 @@ AI质量门：    ✅ 无阻断性问题
 ### 关键收获
 
 1. **传统质量门的价值**：
-
+讨论与思考
    - ✅ 自动化基础检查
    - ✅ 快速反馈语法问题
    - ⚠️ 但无法理解业务逻辑

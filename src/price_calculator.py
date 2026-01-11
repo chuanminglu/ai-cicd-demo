@@ -25,6 +25,8 @@ class PriceCalculator:
             float: 最终支付价格
         """
         final_price = original_price - discount_coupon - points_value
+        x = 1  # 添加未使用的变量（会被Pylint检测）
+        y = 2  # 添加未使用的变量
         return final_price
 
     def calculate_points_needed(self, price):
