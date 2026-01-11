@@ -1,0 +1,62 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout代码
+      uses: actions/checkout@v3
+      
+    - name: 设置Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pylint
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    - name: Pylint代码质量检查
+      run: |
+        echo "🔍 执行Pylint代码质量检查..."
+        pylint src/ --fail-under=8.0 --output-format=text || exit 1
+        echo "✅ Pylint检查通过 (评分 >= 8.0)"
+        
+    - name: Pytest单元测试与覆盖率
+      run: |
+        echo "🧪 执行单元测试并检查覆盖率..."
+        pytest tests/ --cov=src --cov-report=term-missing --cov-fail-under=80 -v
+        echo "✅ 测试通过，覆盖率 >= 80%"
+        
+    - name: 输出质量门总结
+      if: always()
+      run: |
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📊 质量门检查总结"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ 所有质量门检查通过！"
+          echo "   ✓ Pylint代码质量 >= 8.0"
+          echo "   ✓ 测试覆盖率 >= 80%"
+          echo "   ✓ 所有单元测试通过"
+        else
+          echo "❌ 质量门检查失败"
+          echo "请修复上述问题后重新提交"
+        fi
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
+    - name: 上传覆盖率报告
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: .coverage
